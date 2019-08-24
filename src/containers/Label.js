@@ -23,17 +23,15 @@ class Label extends React.Component {
     fetch(url)
       .then(response => response.json())
       .then(this.buildList)
-      .catch();
   }
 
 
   render() {
     const { labels } = this.state;
-    // console.log(labels);
     const boxes = labels.map((label, ind) => {
       return (
         <div className="choices" key={label.id}>
-          <input type="checkbox" onClick={() => this.props.toggleTypes(ind)} />
+          <input type="checkbox" onChange={() => this.props.toggleTypes(ind)} checked={this.props.types[ind]}  />
           <span>{label.title}</span>
         </div>
       )

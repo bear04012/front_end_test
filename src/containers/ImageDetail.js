@@ -33,12 +33,10 @@ class ImageDetail extends React.Component {
     fetch(url)
       .then(response => response.json())
       .then(this.buildList)
-      .catch();
 
   }
   render() {
     let str = dateFormat(this.state.photoTaken, "TT") === "AM" ? "오전" : "오후";
-    console.log(this.state.photoTaken);
     const labels = this.state.labels.map((label, ind) => {
       
       return (

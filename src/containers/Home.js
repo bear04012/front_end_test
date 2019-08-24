@@ -12,7 +12,6 @@ class Home extends React.Component {
       menu:"home",
       meta:null,
       list: [],
-      error: null,
       total: 0,
       currentPage:1,
       maxPage: -1,
@@ -26,7 +25,7 @@ class Home extends React.Component {
     this.toggleTypes = this.toggleTypes.bind(this);
   }
   buildList = (data) => {
-    console.log(data);
+    // console.log(data);
     this.setState({
       meta: data.meta,
       list: data.photos,
@@ -46,15 +45,9 @@ class Home extends React.Component {
     fetch(url)
       .then(response => response.json())
       .then(this.buildList)
-      .catch();
   }
 
   componentDidMount() {
-    // let url = "https://tester-api.nearthlab.com/v1/photos?page="+this.state.currentPage+1;
-    // fetch(url)
-    //   .then(response => response.json())
-    //   .then(this.buildList)
-    //   .catch();
     this.uploadData(1);
     
   }
@@ -111,14 +104,11 @@ class Home extends React.Component {
   render() {
     
     const { menu } = this.state;
-    console.log(this.state.list);
-    // console.log(this.state.currentPage);
-    console.log(this.state.types);
-
+    // console.log(this.state.list);
+    // console.log(this.state.types);
     const photos = this.createPhotos();
     const pages = this.createPages(this.state.maxPage);
-    // const photos = this.state.list.photos.map(image => {
-    //   <div key={image.id}>Hi</div>
+
      
     return ( 
       <div >
@@ -131,9 +121,9 @@ class Home extends React.Component {
           <div className="photos">
             {photos}
           </div>
+
           <div className="pages">
             {pages}
-            ...
           </div>
         </div>
         }
