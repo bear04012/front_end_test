@@ -1,40 +1,60 @@
 import React from 'react';
-import './Home.css';
-import Label from './Label';
-import ImageDetail from './ImageDetail';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMedal } from '@fortawesome/free-solid-svg-icons'
+import LabelTypes from './LabelTypes';
+import PhotoList from '../components/PhotoList';
+import Loading from '../components/Loading';
+import Pagination from '../components/Pagination';
+import styled from "styled-components";
+import qs from 'qs';
+
+const CurrentPage = styled.div`
+  text-align: center;
+`;
+
+const Pages = styled.div`
+  text-align: center;
+  margin-top: 10vh;
+`;
+
+
+const Total = styled.div`
+  margin-top: 20px;
+  margin-bottom: 20px;
+`;
+
 
 class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      menu:"home",
       meta:null,
       list: [],
       total: 0,
-      currentPage:1,
+      currentPage:localStorage.getItem("page")==null?1:localStorage.getItem("page"),
       maxPage: -1,
       id: -1,
-      types: [false,false,false,false],
+      per:-1,
+      types: [false, false, false, false],
+      isLoading: true,
+      permanentComplete:[]
     }
-    this.createPages = this.createPages.bind(this);
-    this.changeMenu = this.changeMenu.bind(this);
+    // 
+    this.buildList = this.buildList.bind(this);
     this.uploadData = this.uploadData.bind(this);
-    this.createPhotos = this.createPhotos.bind(this);
     this.toggleTypes = this.toggleTypes.bind(this);
+    this.handlePage = this.handlePage.bind(this);
   }
-  buildList = (data) => {
+  buildList(data){
     // console.log(data);
     this.setState({
       meta: data.meta,
       list: data.photos,
       total: data.meta.total,
-      maxPage:data.meta.maxPage
+      per:data.meta.per,
+      maxPage: data.meta.maxPage,
+      isLoading:false
     });
   }
-
-  uploadData(num) {
+  async uploadData(num) {
     let str = "";
     this.state.types.forEach((type,ind) => {
       if (type) {
@@ -42,17 +62,15 @@ class Home extends React.Component {
       }
     });
     let url = "https://tester-api.nearthlab.com/v1/photos?page=" + num +"per=12" +str;
-    fetch(url)
-      .then(response => response.json())
-      .then(this.buildList)
+    const response = await fetch(url);
+    const data = await response.json();
+    this.buildList(data);
+      // .then(response => response.json())
+      // .then(this.buildList)
+    console.log(data);
   }
-
   componentDidMount() {
-    this.uploadData(1);
-    
-  }
-  changeMenu() {
-    this.setState({ menu: "home" });
+    this.uploadData(this.state.currentPage);
   }
   toggleTypes(num) {
     let types = this.state.types;
@@ -60,75 +78,39 @@ class Home extends React.Component {
     this.setState({ types });
     this.uploadData(this.state.currentPage);
   }
+  handlePage(num) {
 
-  createPhotos() {
-    let photos = this.state.list.map(photo => {
-      let str = photo.photoUrl;
-      return (
-        <div key={photo.id} onClick={() => {
-          this.setState({
-            menu: "detail",
-            id: photo.id
-          })
-        }} className="photo">
-          {photo.completed && <FontAwesomeIcon style={{ position: "absolute", right: 0, fontSize: "50px", top: -1 }} icon={faMedal} color="gold" />}
-          <img src={photo.photoUrl} height={140} width={180} style={{ borderRadius: "10px" }} />
-          <div style={{ marginTop: '8px', marginLeft: '5px' }}>{str.substring(64)}</div>
-        </div>
+    localStorage.setItem("page", num);
+    this.setState({ currentPage: num });
+    this.uploadData(num)
 
-      )
-    })
-    return photos;
-
-  }
-
-  createPages(num) {
-    let pages = [];
-    let start = (this.state.currentPage - 4 > 0 ? this.state.currentPage - 4 : 1)
-    for (let i = start; i < (start+10>num+1?num+1:start+10); i++) {
-      pages[i] = i;
-    }
-    let maxPage = pages.map(num => {
-      if (this.state.currentPage === num) {
-        return (<button className="selected" style={{color:"green"}} key={num}>{num}</button>)
-      } else {
-        return (<button onClick={() => {
-          this.setState({ currentPage: num })
-          this.uploadData(num);
-        }} key={num}>{num}</button>)
-      }
-    }
-  )
-    return maxPage;
   }
   render() {
-    
-    const { menu } = this.state;
-    // console.log(this.state.list);
-    // console.log(this.state.types);
-    const photos = this.createPhotos();
-    const pages = this.createPages(this.state.maxPage);
+    const { currentPage, types, total, maxPage, list,per,isLoading } = this.state;
+    let currentPics = (currentPage * per);
+    console.log(list);
 
+    // console.log(qs);
+    // let obj = qs.parse('a=c');
+    // let obj = [1, 2, 3];
+    // localStorage.setItem("completes", JSON.stringify(obj));
+    console.log(localStorage);
      
     return ( 
-      <div >
-        {menu === "home" &&
-        <div>
-          <Label types={this.state.types} toggleTypes={this.toggleTypes}/>
-          <div className="total">전체 {(this.state.currentPage) * 12}/{this.state.total}</div>
-          
-          <div className="currentPage">Page of {this.state.currentPage}</div>
-          <div className="photos">
-            {photos}
-          </div>
+      <div style={{margin:"30px"}}>
+        {isLoading ? <Loading /> :
+          <div>
+            <LabelTypes types={types} toggleTypes={this.toggleTypes} />
+            <Total>전체 {currentPics}/{total}</Total>
+            <CurrentPage>Page of {currentPage}</CurrentPage>
 
-          <div className="pages">
-            {pages}
+            <PhotoList list={list} />
+
+            <Pages>
+              <Pagination maxPage={maxPage} currentPage={currentPage} handlePage={this.handlePage} />
+            </Pages>
           </div>
-        </div>
-        }
-        {menu === "detail" && <ImageDetail menu={this.state.menu} changeMenu={this.changeMenu} id={this.state.id} />}
-        
+      }  
       </div>
     );
   }

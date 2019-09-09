@@ -1,9 +1,26 @@
 import React from 'react';
-import './Label.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWrench } from '@fortawesome/free-solid-svg-icons'
+import styled from "styled-components";
 
-class Label extends React.Component {
+const LabelName = styled.div`
+  height: 24px;
+  font-family: NotoSansCJKkr;
+  font-weight:"bold"
+`;
+
+const ChoiceBox = styled.div`
+  display: flex;
+  margin: 20px;
+  margin-left: 0px;
+`;
+
+const Choices = styled.div`
+  display:flex;
+  margin-right: 20px;
+`;
+
+class LabelTypes extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -30,19 +47,20 @@ class Label extends React.Component {
     const { labels } = this.state;
     const boxes = labels.map((label, ind) => {
       return (
-        <div className="choices" key={label.id}>
+        <Choices key={label.id}>
           <input type="checkbox" onChange={() => this.props.toggleTypes(ind)} checked={this.props.types[ind]}  />
-          <span>{label.title}</span>
-        </div>
+          <span>{label.title.substring(3)}</span>
+        </Choices>
       )
     })
     return (
       <div >
-        <div className="labelName" style={{fontWeight:"bold"}}><FontAwesomeIcon style={{ fontSize: "15px",marginRight:"5px"}} icon={faWrench} color="gray" />라벨 종류 선택
-        </div>
-        <div className="choiceBox"> 
+        <LabelName>
+          <FontAwesomeIcon style={{ fontSize: "15px",marginRight:"5px"}} icon={faWrench} color="gray" />라벨 종류 선택
+        </LabelName>
+        <ChoiceBox> 
           {boxes}
-        </div>
+        </ChoiceBox>
         
       </div>
     );
@@ -50,4 +68,4 @@ class Label extends React.Component {
 
 }
 
-export default Label;
+export default LabelTypes;

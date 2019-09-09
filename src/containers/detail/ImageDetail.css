@@ -18,6 +18,11 @@
   margin-top:20px;
 
 }
+.right {
+  display:flex;
+  flex-direction:column;
+
+}
 .label {
   height: 194px;
   border: solid 1px #dfe3ea;
@@ -45,6 +50,15 @@
 .home {
   position:absolute;
   bottom:50px;
+}
+
+.complete {
+  margin-top:30px;
+  align-self:center;
+  border-radius:5px;
+  width:80px;
+  color:white;
+  background:dodgerblue;
 }
 
 .completed {
